@@ -5,15 +5,13 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-  # Step 1: Build the container image using the Buildpacks builder
-  - name: 'gcr.io/k8s-img-deployer/builder' # A common Cloud Build image for buildpacks
+  # Step 1: Use the official buildpack image to build the container
+  - name: 'gcr.io/cloud-builders/buildpack'
     args:
+      - build
       - --builder=gcr.io/buildpacks/builder:v1
       - --image=us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/happyshop:$COMMIT_SHA
-    env:
-      - 'GOOGLE_SERVICES={"name": "happyshop"}'
-      - 'GOOGLE_FUNCTION_SOURCE=.'
-      - 'GOOGLE_RUNTIME=python'
+      - . # Source directory is the current directory
 
   # Step 2: Deploy the image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -21,11 +19,7 @@ steps:
     args:
       - run
       - deploy
-      - happyshop  # Your service name
+      - happyshop
       - --image=us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/happyshop:$COMMIT_SHA
-      - --region=asia-east1 # Use your actual region (asia-east1)
-      - --no-allow-unauthenticated # Or --allow-unauthenticated if needed
-      # Use the dedicated service account for the deployed service (not the build service account)
-      # - --service-account=[YOUR_RUNTIME_SERVICE_ACCOUNT_EMAIL] 
-
-timeout: '1600s'
+      - --region=asia-east1
+      - --no-allow-unauthenticated
