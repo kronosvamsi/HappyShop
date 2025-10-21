@@ -1,3 +1,9 @@
+options:
+  # This setting tells Cloud Build to only use Cloud Logging for logs, 
+  # bypassing the default Google Cloud Storage (GCS) log bucket, which 
+  # solves the permission conflict with your custom service account.
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
   # Step 1: Build the container image using the Buildpacks builder
   - name: 'gcr.io/k8s-img-deployer/builder' # A common Cloud Build image for buildpacks
