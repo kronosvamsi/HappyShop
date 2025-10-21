@@ -1,25 +1,18 @@
 options:
-  # This setting tells Cloud Build to only use Cloud Logging for logs, 
-  # bypassing the default Google Cloud Storage (GCS) log bucket, which 
-  # solves the permission conflict with your custom service account.
+  # FIX for "invalid argument" error: Logs are sent only to Cloud Logging, 
+  # bypassing the default GCS log bucket permission check.
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-  # Step 1: Use the official buildpack image to build the container
-  - name: 'gcr.io/cloud-builders/buildpack'
-    args:
-      - build
-      - --builder=gcr.io/buildpacks/builder:v1
-      - --image=us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/happyshop:$COMMIT_SHA
-      - . # Source directory is the current directory
-
-  # Step 2: Deploy the image to Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-      - run
-      - deploy
-      - happyshop
-      - --image=us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/happyshop:$COMMIT_SHA
-      - --region=asia-east1
-      - --no-allow-unauthenticated
+# Step 1: Build the image using Buildpacks and deploy directly to Cloud Run
+# The --source=. flag triggers the Buildpack process automatically.
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+    - run
+    - deploy
+    - happyshop  # <-- REPLACE with your Cloud Run Service Name if different
+    - --source=.
+    - --region=asia-east1 # <-- REPLACE with your actual region (e.g., us-central1)
+    - --service-account=happyshop-deployer@happyshop-475709.iam.gserviceaccount.com # <-- REPLACE with your full runtime Service Account Email
+    - --no-allow-unauthenticated # <-- Change to --allow-unauthenticated if you want public access
