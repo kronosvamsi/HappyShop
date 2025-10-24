@@ -13,11 +13,11 @@ class ProductModel(BaseModel):
         from_attributes=True
 
 class CategoryModel(BaseModel):
-    id:int
+   
     name:str
 
 class OrderModel(BaseModel):
-    id:int
+   
     product_id:int
     user_id:int
     firstname:str
@@ -28,7 +28,6 @@ class OrderModel(BaseModel):
         from_attributes= True
 
 class UserModel(BaseModel):
-    id:int
     name:str
     firstname:str
     lastname:str

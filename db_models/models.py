@@ -61,4 +61,9 @@ Base.metadata.create_all(engine)
 
 Session = sessionmaker(autoflush=False,autocommit=False, bind=engine)
 
-
+def get_db():
+    session=Session()
+    try:
+        yield session
+    finally:
+        session.close()
