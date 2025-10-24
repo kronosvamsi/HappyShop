@@ -122,7 +122,6 @@ def update_product_by_id(product_id:int,product_up:ProductModel, session:Session
 def delete_product_by_id(product_id:int, session:Session = Depends(get_db)):
     try:
         db_product = session.get(Product,product_id)
-        # print(db_product)
         if db_product is None:
             raise HTTPException(status_code=404, detail= f"The product with ID {product_id} not found")
         
