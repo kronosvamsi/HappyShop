@@ -13,8 +13,11 @@ class ProductModel(BaseModel):
         from_attributes=True
 
 class CategoryModel(BaseModel):
-   
+    id:Optional[int] =None
     name:str
+
+    class Config:
+        from_attributes = True
 
 class OrderModel(BaseModel):
    
