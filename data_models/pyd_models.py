@@ -3,7 +3,7 @@ from typing import Optional
 
 
 class ProductModel(BaseModel):
-    
+    id:Optional[int] = None
     category_id:int
     name:str
     quantity:int
@@ -20,7 +20,7 @@ class CategoryModel(BaseModel):
         from_attributes = True
 
 class OrderModel(BaseModel):
-   
+    id:Optional[int] = None
     product_id:int
     user_id:int
     firstname:str
@@ -31,6 +31,7 @@ class OrderModel(BaseModel):
         from_attributes= True
 
 class UserModel(BaseModel):
+    id:Optional[int] = None
     name:str
     firstname:str
     lastname:str
