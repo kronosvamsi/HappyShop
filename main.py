@@ -4,12 +4,13 @@ from data_models.pyd_models import ProductModel,CategoryModel
 # from  db_models.models import Product
 from sqlalchemy.exc import IntegrityError, OperationalError
 from pydantic import ValidationError
-from routes import products,categories
+from routes import products,categories,users
 
 app=FastAPI()
 
 app.include_router(products.router)
 app.include_router(categories.router)
+app.include_router(users.router)
 
 def get_db():
     session=Session()
