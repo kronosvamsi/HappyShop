@@ -64,7 +64,7 @@ INSTANCE_CONN_NAME = os.environ.get("INSTANCE_CONNECTION_NAME")
 
 
 # It's recommended to initialize the Connector outside the request context (global scope)
-connector = Connector()
+connector = Connector(refresh_strategy="lazy" )
 
 def getconn():
     # Inside this method, we call the connector's connect method, 
@@ -78,7 +78,7 @@ def getconn():
         password=DB_PASS,
         database=DB_NAME,
         # Optional: Set refresh strategy to "lazy" for serverless environments
-        refresh_strategy="lazy" 
+        
     )
     return conn
 
