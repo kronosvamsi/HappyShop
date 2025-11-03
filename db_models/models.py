@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine,Column,Integer,String,Float,ForeignKey
 from sqlalchemy.orm import relationship, declarative_base,sessionmaker
-
+from google.cloud.sql.connector import Connector
 # class Base(declarative_base()):
 
 #     pass
@@ -53,11 +53,50 @@ class User(Base):
     orders=relationship("Order",back_populates="user")
 
 
-DB_URL= "mysql+mysqlconnector://root:mysql1234@127.0.0.1:3306/my_db"
 
-engine = create_engine(DB_URL, echo=True)
+# Get these from environment variables for security in Cloud Run/App Engine
+DB_USER = os.environ.get("DB_USER")          # e.g., 'app_user'
+DB_PASS = os.environ.get("DB_PASS")          # e.g., 'your_app_password'
+DB_NAME = os.environ.get("DB_NAME")          # e.g., 'my_app_db'
+# e.g., 'project-id:region:instance-id'
+INSTANCE_CONN_NAME = os.environ.get("INSTANCE_CONNECTION_NAME")
 
-Base.metadata.create_all(engine)
+
+# It's recommended to initialize the Connector outside the request context (global scope)
+connector = Connector()
+
+def getconn():
+    # Inside this method, we call the connector's connect method, 
+    # passing the standard database driver arguments (user, password, etc.).
+    conn = connector.connect(
+        INSTANCE_CONN_NAME,
+        # The Python database driver you are using
+        "pymysql", 
+        # --- HERE is where you select the user, password, and database ---
+        user=DB_USER,
+        password=DB_PASS,
+        database=DB_NAME,
+        # Optional: Set refresh strategy to "lazy" for serverless environments
+        refresh_strategy="lazy" 
+    )
+    return conn
+
+# --- 4. Create the SQLAlchemy Engine ---
+# SQLAlchemy uses the 'creator' argument to manage connections securely.
+engine = create_engine(
+    "mysql+pymysql://",  # Use an empty URL or just the dialect
+    creator=getconn,     # Pass your creator function here
+    pool_size=5,         # Recommended pool settings for serverless
+    max_overflow=2,
+    pool_timeout=30,
+    pool_recycle=1800
+)
+
+# DB_URL= "mysql+mysqlconnector://root:mysql1234@127.0.0.1:3306/my_db"
+
+# engine = create_engine(DB_URL, echo=True)
+
+# Base.metadata.create_all(engine)
 
 Session = sessionmaker(autoflush=False,autocommit=False, bind=engine)
 
