@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine,Column,Integer,String,Float,ForeignKey
 from sqlalchemy.orm import relationship, declarative_base,sessionmaker
 from google.cloud.sql.connector import Connector
+import os
 # class Base(declarative_base()):
 
 #     pass
